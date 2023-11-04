@@ -33,6 +33,22 @@ theme_estat <- function(...) {
 }
 
 
+#Análise 1
+
+#Organizando o banco de dados
+
+vendas1 <- na.omit(vendas1)
+duplicados <- duplicated(vendas1)
+
+#Gráfico de Setor para ilustrar "Faturamento anual por categoria"
+
+vendas1$X..Category.. <- ifelse(vendas1$X..Category.. == "Women's Fashion", "Moda Feminina", vendas1$X..Category..)
+vendas1$X..Category..<- ifelse(vendas1$X..Category.. == "Men's Fashion", "Moda Masculina", vendas1$X..Category..)
+vendas1$X..Category.. <- ifelse(vendas1$X..Category..== "Kids' Fashion", "Moda Infantil", vendas1$X..Category..)
+
+
+
+
 
 #Análise 2
 
@@ -224,7 +240,6 @@ aes(x = X..Price.., y = X..Rating..) +
 
 setwd('E:/Natasha/Projeto-Fantasma/resultados')
 ggsave("análise4.pdf", width = 158, height = 93, units = "mm")
-
 
 
 #Calculando o Coeficiente de Correlação de Pearson
