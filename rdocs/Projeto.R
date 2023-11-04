@@ -133,7 +133,7 @@ xtable::xtable(quadro_resumo)
 #Gráfico dos preços por marca
 
 
-vendas <- na.omit(vendas)
+vendas <- na.omit(vendas1)
 
 ggplot(vendas) +
   aes(x = gsub("\"", "", `""Brand""`), y = `""Price""`) +
@@ -201,4 +201,35 @@ ggsave("análise3.pdf", width = 158, height = 93, units = "mm")
 
 vendas <- na.omit(vendas)
 
+#Análise 4
 
+#Gráfico de Dispersão Bivariado para ilustrar "Relação entre preço e avaliação"
+
+vendas1 <- na.omit(vendas1)
+
+duplicados <- duplicated(vendas1)
+duplicados
+
+vendas1$X..Rating.. <- as.numeric(vendas1$X..Rating..)
+vendas1$X..Rating.. <- round(vendas1$X..Rating.., 1)
+
+ggplot(vendas1) +
+aes(x = X..Price.., y = X..Rating..) +
+  geom_point(colour = "#A11D21", size = 3) +
+  labs(
+    x = "Preço por peça",
+    y = "Avaliação por peça"
+  ) +
+  theme_estat()
+
+setwd('E:/Natasha/Projeto-Fantasma/resultados')
+ggsave("análise4.pdf", width = 158, height = 93, units = "mm")
+
+
+
+#Calculando o Coeficiente de Correlação de Pearson
+
+coeficiente_pearson <- cor(vendas1$X..Price.., vendas1$X..Rating..)
+coeficiente_pearson
+
+#O Coeficiente de Correlação de Pearson é de 0.9075942. Apresenta uma correlação diretamente proporcional forte.
