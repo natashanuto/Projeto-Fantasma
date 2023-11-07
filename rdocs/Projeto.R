@@ -59,7 +59,7 @@ vendas1$X..Category.. <- ifelse(vendas1$X..Category..== "Kids' Fashion", "Moda I
 marcas <- unique(vendas$`""Brand""`)
 marcas
 
-#As marcas a serem avaliadas são Adidas, H&M, Zara, Gucci, Nike.
+#As marcas a serem avaliadas são Adidas, H&M, Zara, Gucci e Nike.
 
 
 #Adidas
@@ -248,3 +248,110 @@ coeficiente_pearson <- cor(vendas1$X..Price.., vendas1$X..Rating..)
 coeficiente_pearson
 
 #O Coeficiente de Correlação de Pearson é de 0.9075942. Apresenta uma correlação diretamente proporcional forte.
+
+
+
+#Análise 5
+
+devolucoes <- unique(vendas1$X..Motivo.devolução...)
+devolucoes
+
+#Os tipos de devolução são "Não informado", "Arrependimento" ou "Produto com defeito"
+#As marcas do banco de dados são Adidas, H&M, Zara, Gucci e Nike.
+
+
+#Devoluções com motivo "Produto com defeito"
+
+produto_com_defeito <- vendas1 [vendas1$X..Motivo.devolução... == "Produto com defeito",] 
+frequencia_absoluta_pcd <- table(produto_com_defeito$X..Brand..)
+
+#Frequências absolutas são: 
+#Adidas  Gucci    H&M   Nike   Zara 
+#   26     17     24     27     18 
+
+frequencia_relativa_pcd <- (frequencia_absoluta_pcd / sum(frequencia_absoluta_pcd)) * 100
+frequencia_porcentagem_arredondada_pcd <- round(frequencia_relativa_pcd, 2)
+
+#Frequências relativas em porcentagem são:
+#Adidas  Gucci    H&M   Nike   Zara 
+# 23.21  15.18  21.43  24.11  16.07
+
+
+#Devoluções com motivo "Arrependimento"
+
+arrependimento <- vendas1[vendas1$X..Motivo.devolução... == "Arrependimento", ]
+frequencia_absoluta_ar <- table(arrependimento$X..Brand..)
+
+#Frequências absolutas são:
+#Adidas  Gucci    H&M   Nike   Zara 
+#   20     23     19     35     30 
+
+frequencia_relativa_ar <- (frequencia_absoluta_ar / sum(frequencia_absoluta_ar)) * 100
+frequencia_porcentagem_arredondada_ar <- round(frequencia_relativa_ar, 2)
+
+#Frequências relativas em porcentagem são:
+#Adidas  Gucci    H&M   Nike   Zara 
+# 15.75  18.11  14.96  27.56  23.62 
+
+
+
+
+#Devoluções com motivo "Não informado"
+
+nao_informado <- vendas1[vendas1$X..Motivo.devolução... == "Não informado", ]
+frequencia_absoluta_ni <- table(nao_informado$X..Brand..)
+
+#Frequências absolutas são:
+#Adidas  Gucci    H&M   Nike   Zara 
+#   28     25     18     23     18 
+
+frequencia_relativa_ni <- (frequencia_absoluta_ni / sum(frequencia_absoluta_ni)) * 100
+frequencia_porcentagem_arredondada_ni <- round(frequencia_relativa_ni, 2)
+
+#Frequências relativas em porcentagem são:
+#Adidas  Gucci    H&M   Nike   Zara 
+# 25.00  22.32  16.07  20.54  16.07 
+
+
+
+#Gráfico para ilustrar a tabela
+  
+
+devolucao_marcas <- vendas1 %>%
+  mutate(
+    Devolução = case_when(
+      X..Motivo.devolução... %>% str_detect("Arrependimento") ~ "Arrependimento",
+      X..Motivo.devolução... %>% str_detect("Produto com defeito") ~ "Produto com defeito",
+      X..Motivo.devolução... %>% str_detect("Não informado") ~ "Não informado"
+    ),
+    Marca = case_when(
+      X..Brand.. %>% str_detect("Adidas") ~ "Adidas",
+      X..Brand.. %>% str_detect("Gucci") ~ "Gucci",
+      X..Brand.. %>% str_detect("H&M") ~ "H&M",
+      X..Brand.. %>% str_detect("Nike") ~ "Nike",
+      X..Brand.. %>% str_detect("Zara") ~ "Zara"
+    )
+  ) %>%
+  group_by(Devolução, Marca) %>%
+  summarise(freq = n()) %>%
+  ungroup() %>%
+  group_by(Devolução) %>%
+  mutate(freq_relativa = freq / sum(freq))
+
+ggplot(devolucao_marcas) +
+  aes(
+    x = fct_reorder(Devolução, freq, .desc = TRUE), y = freq,
+    fill = Marca
+  ) +
+  geom_col(position = position_dodge2(preserve = "single", padding = 0)) +
+  geom_text(
+    aes(label = paste0(freq, " (", scales::percent(freq_relativa), ")")),
+    position = position_dodge(width = 0.9),
+    vjust = -0.5, hjust = 0.5,
+    size = 1.5
+  ) +
+  labs(x = "Tipo de Devolução", y = "Frequência") +
+  theme_estat()
+
+ggsave("analise5.pdf", width = 158, height = 93, units = "mm")
+  
