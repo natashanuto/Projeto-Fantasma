@@ -40,13 +40,53 @@ theme_estat <- function(...) {
 vendas1 <- na.omit(vendas1)
 duplicados <- duplicated(vendas1)
 
-#Gráfico de Setor para ilustrar "Faturamento anual por categoria"
-
 vendas1$X..Category.. <- ifelse(vendas1$X..Category.. == "Women's Fashion", "Moda Feminina", vendas1$X..Category..)
 vendas1$X..Category..<- ifelse(vendas1$X..Category.. == "Men's Fashion", "Moda Masculina", vendas1$X..Category..)
 vendas1$X..Category.. <- ifelse(vendas1$X..Category..== "Kids' Fashion", "Moda Infantil", vendas1$X..Category..)
 
+vendas1$X..Price.. <- as.numeric(vendas1$X..Price..)
 
+faturamento_anual_total <- sum(vendas1$X..Price..)
+
+#O faturamento anual total é de 17.734
+
+#Faturamento anual de Moda Feminina
+
+moda_feminina <- vendas1[vendas1$X..Category..== "Moda Feminina",]
+faturamento_moda_feminina <- sum(moda_feminina$X..Price..)
+
+#O faturamento anual da Moda Feminina é de 6.027
+
+freq_moda_feminina <- (faturamento_moda_feminina) / (faturamento_anual_total)
+
+#A frequência relativa do faturalmento anual da Moda Feminina é 34,00%
+
+
+#Faturamento anual de Moda Masculina
+
+moda_masculina <- vendas1[vendas1$X..Category..== "Moda Masculina",]
+faturamento_moda_masculina <- sum(moda_masculina$X..Price..)
+
+#O faturamento anual da Moda Masculina é de 5.487
+
+freq_moda_masculina <- (faturamento_moda_masculina) / (faturamento_anual_total)
+
+#A frequência relativa do faturalmento anual da Moda Masculina é 30,94%
+
+
+#Faturamento anual de Moda Infantil
+
+moda_infantil <- vendas1[vendas1$X..Category..== "Moda Infantil",]
+faturamento_moda_infantil <- sum(moda_infantil$X..Price..)
+
+#O faturamento anual da Moda Infantil é de 6.220
+
+freq_moda_infantil<- (faturamento_moda_infantil) / (faturamento_anual_total)
+
+#A frequência relativa do faturalmento anual da Moda Infantil é 35,07%
+
+
+#Gráfico de Setor para ilustrar "Faturamento anual por categoria"
 
 
 
@@ -292,8 +332,6 @@ frequencia_porcentagem_arredondada_ar <- round(frequencia_relativa_ar, 2)
 #Frequências relativas em porcentagem são:
 #Adidas  Gucci    H&M   Nike   Zara 
 # 15.75  18.11  14.96  27.56  23.62 
-
-
 
 
 #Devoluções com motivo "Não informado"
