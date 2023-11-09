@@ -94,104 +94,98 @@ freq_moda_infantil<- (faturamento_moda_infantil) / (faturamento_anual_total)
 
 
 #Variação de preço por marca
- 
+
 
 marcas <- unique(vendas$`""Brand""`)
-marcas
 
 #As marcas a serem avaliadas são Adidas, H&M, Zara, Gucci e Nike.
 
+#Data frame com apenas marcas e preços
+
+analise2 <- select(vendas, `""Brand""`, `""Price""`)
+analise2 <- na.omit(analise2)
 
 #Adidas
 
-vendas1$X..Price.. <- as.numeric(vendas1$X..Price..)
-adidas <- vendas[vendas$`""Brand""`== "\"\"Adidas\"\""]
+adidas <- analise2[analise2$`""Brand""`== "\"\"Adidas\"\""]
 summary(adidas$`""Price""`)
 sd(adidas$`""Price""`)
 
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max.  Desvio Padrão
-#10.00   43.25   52.00   51.80   62.00   89.00     16.46
+#10.00   41.00   52.00   51.45   62.00   96.00     16.43
 
 
 #Gucci
 
-vendas1$X..Price.. <- as.numeric(vendas1$X..Price..)
-gucci <- vendas[vendas$`""Brand""`== "\"\"Gucci\"\""]
+gucci <- analise2[analise2$`""Brand""`== "\"\"Gucci\"\""]
 summary(gucci$`""Price""`)
 sd(gucci$`""Price""`)
 
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max.  Desvio Padrão
-#10.00   34.00   45.00   45.52   56.00   92.00    16.38
+#10.00   38.00   50.00   49.71   61.00   92.00    15.63
 
 
 #H&M
 
-vendas1$X..Price.. <- as.numeric(vendas1$X..Price..)
-hnm <- vendas[vendas$`""Brand""`== "\"\"H&M\"\""]
+hnm <- analise2[analise2$`""Brand""`== "\"\"H&M\"\""]
 summary(hnm$`""Price""`)
 sd(hnm$`""Price""`)
 
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max. Desvio Padrão
-#25.00   36.00   47.00   48.21   55.00  100.00   16.18
+#10.00   38.00   49.00   49.44   59.00  100.00   16.26
 
 
 #Nike
 
-vendas1$X..Price.. <- as.numeric(vendas1$X..Price..)
-nike <- vendas[vendas$`""Brand""`== "\"\"Nike\"\""]
+nike <- analise2[analise2$`""Brand""`== "\"\"Nike\"\""]
 summary(nike$`""Price""`)
 sd(nike$`""Price""`)
 
-#  Min. 1st Qu.  Median    Mean 3rd Qu.    Max. Desvio Padrão
-#10.00   43.00   55.00   53.54   65.00   90.00    16.90
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. Desvio Padrão
+#10.00   38.00   51.00   49.77   62.00   90.00    17.16
 
 
 #Zara
 
-vendas1$X..Price.. <- as.numeric(vendas1$X..Price..)
-zara <- vendas[vendas$`""Brand""`== "\"\"Zara\"\""]
+zara <- analise2[analise2$`""Brand""`== "\"\"Zara\"\""]
 summary(zara$`""Price""`)
 sd(zara$`""Price""`)
 
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max.  Desvio Padrão
-#10.00   44.25   51.00   52.27   61.00   85.00     15.36
+#10.00   43.00   53.00   52.86   63.00   90.00     15.36
 
 
 # Quadro Resumo
 
-vendas1$X..Price.. <- as.numeric(vendas1$X..Price..) #Transformar para númerico
 
-quadro_resumo <- vendas1 %>% 
-  group_by(X..Brand..) %>% 
-  summarize(Média = round(mean(X..Price..),2),
-            `Desvio Padrão` = round(sd(X..Price..),2),
-            `Variância` = round(var(X..Price..),2),
-            `Mínimo` = round(min(X..Price..),2),
-            `1º Quartil` = round(quantile(X..Price.., probs = .25),2),
-            Mediana = round(quantile(X..Price.., probs = .5),2),
-            `3º Quartil` = round(quantile(X..Price.., probs = .75),2),
-            `Máximo` = round(max(X..Price..),2)) %>% t() %>% as.data.frame() %>% 
+quadro_resumo <- analise2 %>% 
+  group_by(`""Brand""`) %>% 
+  summarize(Média = round(mean(`""Price""`),2),
+            `Desvio Padrão` = round(sd(`""Price""`),2),
+            `Variância` = round(var(`""Price""`),2),
+            `Mínimo` = round(min(`""Price""`),2),
+            `1º Quartil` = round(quantile(`""Price""`, probs = .25),2),
+            Mediana = round(quantile(`""Price""`, probs = .5),2),
+            `3º Quartil` = round(quantile(`""Price""`, probs = .75),2),
+            `Máximo` = round(max(`""Price""`),2)) %>% t() %>% as.data.frame() %>% 
   mutate(V1 = str_replace(V1,"\\.",",")) 
 
 xtable::xtable(quadro_resumo)
 
-#X..Brand.. & Adidas & Gucci & H\&M & Nike & Zara \\ 
-#Média & 51,80 & 45.52 & 48.21 & 53.54 & 52.27 \\ 
-#Desvio Padrão & 16,46 & 16.38 & 16.18 & 16.90 & 15.36 \\ 
-#Variância & 270,88 & 268.16 & 261.80 & 285.47 & 235.96 \\ 
-#Mínimo & 10 & 10 & 25 & 10 & 10 \\ 
-#1º Quartil & 43,25 & 34.00 & 36.00 & 43.00 & 44.25 \\ 
-#Mediana & 52 & 45 & 47 & 55 & 51 \\ 
-#3º Quartil & 62 & 56 & 55 & 65 & 61 \\ 
-#Máximo &  89 &  92 & 100 &  90 &  85 \\
-
+#""Brand"" & ""Adidas"" & ""Gucci"" & ""H\&M"" & ""Nike"" & ""Zara"" \\ 
+#Média & 51,45 & 49.71 & 49.44 & 49.77 & 52.86 \\ 
+#Desvio Padrão & 16,43 & 15.63 & 16.26 & 17.16 & 15.36 \\ 
+#Variância & 270,04 & 244.23 & 264.45 & 294.31 & 235.99 \\ 
+#Mínimo & 10 & 10 & 10 & 10 & 10 \\ 
+#1º Quartil & 41 & 38 & 38 & 38 & 43 \\ 
+#Mediana & 52 & 50 & 49 & 51 & 53 \\ 
+#3º Quartil & 62 & 61 & 59 & 62 & 63 \\ 
+#Máximo &  96 &  92 & 100 &  90 &  90 \\ 
 
 #Gráfico dos preços por marca
 
 
-vendas <- na.omit(vendas1)
-
-ggplot(vendas) +
+ggplot(analise2) +
   aes(x = gsub("\"", "", `""Brand""`), y = `""Price""`) +
   geom_boxplot(fill = c("#A11D21"), width = 0.5) +
   stat_summary(
@@ -200,37 +194,42 @@ ggplot(vendas) +
   labs(x = "Marcas", y = "Preço da peça") +
   theme_estat()
 
-ggsave("preco_marcas.pdf", width = 158, height = 93, units = "mm")
+ggsave("analise2certa.pdf", width = 158, height = 93, units = "mm")
 
 
 #Análise 3
 
-vendas1 <- as.data.frame(lapply(vendas, function(col) str_replace_all(col, '"', '')))
-
 cores <- unique(vendas$`""Color""`)
-cores
+
 # As cores a serem analisadas são "Preto","Amarelo","Branco","Azul","Verde" e "Vermelho".
 
+#Data frame para a Análise 3
+
+analise3 <- select(vendas, `""Category""`, `""Color""`)
+analise3 <- na.omit(analise3)
 
 # Gráfico da relação entre categorias (apenas feminino e masculino) e cores
 
-colors2 <- vendas1 %>%
-  mutate(Color = case_when(
-    str_detect(X..Color.., "Black") ~ "Preto",
-    str_detect(X..Color.., "Yellow") ~ "Amarelo",
-    str_detect(X..Color.., "White") ~ "Branco",
-    str_detect(X..Color.., "Blue") ~ "Azul",
-    str_detect(X..Color.., "Green") ~ "Verde",
-    str_detect(X..Color.., "Red") ~ "Vermelho"
-  ),
-  Categoria = case_when(
-    str_detect(X..Category.., "Women's Fashion") ~ "Moda Feminina",
-    str_detect(X..Category.., "Men's Fashion") ~ "Moda Masculina",
-    TRUE ~ as.character(X..Category..)  
-  )) %>%
-  filter(X..Category.. != "Kids' Fashion") %>%
-  filter(!is.na(Color)) %>%
-  group_by(Color, Categoria) %>%
+
+colors2 <- analise3 %>%
+  mutate(
+    Cor = case_when(
+      str_detect(`""Color""`, "\"\"Black\"\"") ~ "Preto",
+      str_detect(`""Color""`, "\"\"Yellow\"\"") ~ "Amarelo",
+      str_detect(`""Color""`, "\"\"White\"\"") ~ "Branco",
+      str_detect(`""Color""`, "\"\"Blue\"\"") ~ "Azul",
+      str_detect(`""Color""`, "\"\"Green\"\"") ~ "Verde",
+      str_detect(`""Color""`, "\"\"Red\"\"") ~ "Vermelho"
+    ),
+    Categoria = case_when(
+      str_detect(`""Category""`, "\"\"Women's Fashion\"\"") ~ "Moda Feminina",
+      str_detect(`""Category""`, "\"\"Men's Fashion\"\"") ~ "Moda Masculina",
+      TRUE ~ as.character(`""Category""`)
+    )
+  ) %>%
+  filter(`""Category""` != "\"\"Kids' Fashion\"\"") %>%
+  filter(!is.na(Cor)) %>%
+  group_by(Cor, Categoria) %>%
   summarise(freq = n()) %>%
   mutate(freq_relativa = scales::percent(freq / sum(freq)))
 
@@ -241,7 +240,7 @@ legendas <- str_squish(str_c(colors2$freq, " (", porcentagens, ")"))
 
 ggplot(colors2) +
   aes(
-    x = fct_reorder(Color, freq, .desc = T), y = freq,
+    x = fct_reorder(Cor, freq, .desc = T), y = freq,
     fill = Categoria, label = legendas
   ) +
   geom_col(position = position_dodge2(preserve = "single", padding = 0)) +
@@ -255,22 +254,22 @@ ggplot(colors2) +
 ggsave("análise3.pdf", width = 158, height = 93, units = "mm")
 
 
-vendas <- na.omit(vendas)
 
 #Análise 4
 
+
+#Data frame para Análise 4
+
+analise4 <- select(vendas, `""Rating""`, `""Price""`)
+analise4 <- na.omit(analise4)
+analise4$`""Rating""` <- as.numeric(analise4$`""Rating""`)
+analise4$`""Rating""` <- round(analise4$`""Rating""`, 1)
+
 #Gráfico de Dispersão Bivariado para ilustrar "Relação entre preço e avaliação"
 
-vendas1 <- na.omit(vendas1)
 
-duplicados <- duplicated(vendas1)
-duplicados
-
-vendas1$X..Rating.. <- as.numeric(vendas1$X..Rating..)
-vendas1$X..Rating.. <- round(vendas1$X..Rating.., 1)
-
-ggplot(vendas1) +
-aes(x = X..Price.., y = X..Rating..) +
+ggplot(analise4) +
+  aes(x =`""Price""`, y = `""Rating""`) +
   geom_point(colour = "#A11D21", size = 3) +
   labs(
     x = "Preço por peça",
@@ -278,103 +277,104 @@ aes(x = X..Price.., y = X..Rating..) +
   ) +
   theme_estat()
 
-setwd('E:/Natasha/Projeto-Fantasma/resultados')
-ggsave("análise4.pdf", width = 158, height = 93, units = "mm")
+ggsave("análise4correta.pdf", width = 158, height = 93, units = "mm")
 
 
 #Calculando o Coeficiente de Correlação de Pearson
 
-coeficiente_pearson <- cor(vendas1$X..Price.., vendas1$X..Rating..)
-coeficiente_pearson
+coeficiente_pearson <- cor(analise4$`""Rating""`, analise4$`""Price""`)
 
-#O Coeficiente de Correlação de Pearson é de 0.9075942. Apresenta uma correlação diretamente proporcional forte.
+#O Coeficiente de Correlação de Pearson é de 0.9108202. Apresenta uma correlação diretamente proporcional forte.
 
 
 
 #Análise 5
 
-devolucoes <- unique(vendas1$X..Motivo.devolução...)
-devolucoes
+devolucoes <- unique(vendas$`""Motivo devolução"""`)
 
 #Os tipos de devolução são "Não informado", "Arrependimento" ou "Produto com defeito"
 #As marcas do banco de dados são Adidas, H&M, Zara, Gucci e Nike.
 
+#Data frame para Análise 5
+
+analise5 <- select(vendas, `""Motivo devolução"""`, `""Brand""`,`""...1.y""`)
+analise5 <- na.omit(analise5)
 
 #Devoluções com motivo "Produto com defeito"
 
-produto_com_defeito <- vendas1 [vendas1$X..Motivo.devolução... == "Produto com defeito",] 
-frequencia_absoluta_pcd <- table(produto_com_defeito$X..Brand..)
+produto_com_defeito <- analise5[analise5$`""Motivo devolução"""` == "\"\"Produto com defeito\"\"\"",]
+frequencia_absoluta_pcd <- table(produto_com_defeito$`""Brand""`)
 
 #Frequências absolutas são: 
 #Adidas  Gucci    H&M   Nike   Zara 
-#   26     17     24     27     18 
+#   30     20     27     29     20 
 
 frequencia_relativa_pcd <- (frequencia_absoluta_pcd / sum(frequencia_absoluta_pcd)) * 100
 frequencia_porcentagem_arredondada_pcd <- round(frequencia_relativa_pcd, 2)
 
 #Frequências relativas em porcentagem são:
 #Adidas  Gucci    H&M   Nike   Zara 
-# 23.21  15.18  21.43  24.11  16.07
+# 23.81  15.87  21.43  23.02  15.87
 
 
 #Devoluções com motivo "Arrependimento"
 
-arrependimento <- vendas1[vendas1$X..Motivo.devolução... == "Arrependimento", ]
-frequencia_absoluta_ar <- table(arrependimento$X..Brand..)
+arrependimento <- analise5[analise5$`""Motivo devolução"""` == "\"\"Arrependimento\"\"\"", ]
+frequencia_absoluta_ar <- table(arrependimento$`""Brand""`)
 
 #Frequências absolutas são:
 #Adidas  Gucci    H&M   Nike   Zara 
-#   20     23     19     35     30 
+#   20     24     19     39     34 
 
 frequencia_relativa_ar <- (frequencia_absoluta_ar / sum(frequencia_absoluta_ar)) * 100
 frequencia_porcentagem_arredondada_ar <- round(frequencia_relativa_ar, 2)
 
 #Frequências relativas em porcentagem são:
 #Adidas  Gucci    H&M   Nike   Zara 
-# 15.75  18.11  14.96  27.56  23.62 
+# 14.71  17.65  13.97  28.68  25.00 
 
 
 #Devoluções com motivo "Não informado"
 
-nao_informado <- vendas1[vendas1$X..Motivo.devolução... == "Não informado", ]
-frequencia_absoluta_ni <- table(nao_informado$X..Brand..)
+nao_informado <- analise5[analise5$`""Motivo devolução"""`== "\"\"Não informado\"\"\"", ]
+frequencia_absoluta_ni <- table(nao_informado$`""Brand""`)
 
 #Frequências absolutas são:
 #Adidas  Gucci    H&M   Nike   Zara 
-#   28     25     18     23     18 
+#   28     26     22     28     20 
 
 frequencia_relativa_ni <- (frequencia_absoluta_ni / sum(frequencia_absoluta_ni)) * 100
 frequencia_porcentagem_arredondada_ni <- round(frequencia_relativa_ni, 2)
 
 #Frequências relativas em porcentagem são:
 #Adidas  Gucci    H&M   Nike   Zara 
-# 25.00  22.32  16.07  20.54  16.07 
+# 22.58  20.97  17.74  22.58  16.13 
 
 
 
 #Gráfico para ilustrar a tabela
-  
 
-devolucao_marcas <- vendas1 %>%
+
+devolucao_marcas <- analise5 %>%
   mutate(
     Devolução = case_when(
-      X..Motivo.devolução... %>% str_detect("Arrependimento") ~ "Arrependimento",
-      X..Motivo.devolução... %>% str_detect("Produto com defeito") ~ "Produto com defeito",
-      X..Motivo.devolução... %>% str_detect("Não informado") ~ "Não informado"
+      `""Motivo devolução"""` %>% str_detect("\"\"Arrependimento\"\"\"") ~ "Arrependimento",
+      `""Motivo devolução"""` %>% str_detect("\"\"Produto com defeito\"\"\"") ~ "Produto com defeito",
+      `""Motivo devolução"""` %>% str_detect("\"\"Não informado\"\"\"") ~ "Não informado"
     ),
     Marca = case_when(
-      X..Brand.. %>% str_detect("Adidas") ~ "Adidas",
-      X..Brand.. %>% str_detect("Gucci") ~ "Gucci",
-      X..Brand.. %>% str_detect("H&M") ~ "H&M",
-      X..Brand.. %>% str_detect("Nike") ~ "Nike",
-      X..Brand.. %>% str_detect("Zara") ~ "Zara"
+      `""Brand""` %>% str_detect("\"\"Adidas\"\"") ~ "Adidas",
+      `""Brand""` %>% str_detect("\"\"Gucci\"\"") ~ "Gucci",
+      `""Brand""` %>% str_detect("\"\"H&M\"\"") ~ "H&M",
+      `""Brand""` %>% str_detect("\"\"Nike\"\"") ~ "Nike",
+      `""Brand""` %>% str_detect("\"\"Zara\"\"") ~ "Zara"
     )
   ) %>%
   group_by(Devolução, Marca) %>%
   summarise(freq = n()) %>%
   ungroup() %>%
   group_by(Devolução) %>%
-  mutate(freq_relativa = freq / sum(freq))
+  mutate(freq_relativa = freq / sum(freq)) 
 
 ggplot(devolucao_marcas) +
   aes(
@@ -386,10 +386,10 @@ ggplot(devolucao_marcas) +
     aes(label = paste0(freq, " (", scales::percent(freq_relativa), ")")),
     position = position_dodge(width = 0.9),
     vjust = -0.5, hjust = 0.5,
-    size = 1.5
+    size = 2
   ) +
   labs(x = "Tipo de Devolução", y = "Frequência") +
   theme_estat()
 
-ggsave("analise5.pdf", width = 158, height = 93, units = "mm")
+ggsave("analise5certa.pdf", width = 158, height = 93, units = "mm")
   
