@@ -357,7 +357,7 @@ frequencia_porcentagem_arredondada_ni <- round(frequencia_relativa_ni, 2)
 
 devolucao_marcas <- analise5 %>%
   mutate(
-    Devolução = case_when(
+    Devolucao = case_when(
       `""Motivo devolução"""` %>% str_detect("\"\"Arrependimento\"\"\"") ~ "Arrependimento",
       `""Motivo devolução"""` %>% str_detect("\"\"Produto com defeito\"\"\"") ~ "Produto com defeito",
       `""Motivo devolução"""` %>% str_detect("\"\"Não informado\"\"\"") ~ "Não informado"
@@ -370,26 +370,28 @@ devolucao_marcas <- analise5 %>%
       `""Brand""` %>% str_detect("\"\"Zara\"\"") ~ "Zara"
     )
   ) %>%
-  group_by(Devolução, Marca) %>%
+  group_by(Devolucao, Marca) %>%
   summarise(freq = n()) %>%
   ungroup() %>%
-  group_by(Devolução) %>%
-  mutate(freq_relativa = freq / sum(freq)) 
+  group_by(Devolucao) %>%
+  mutate(freq_relativa = freq / sum(freq))
 
-ggplot(devolucao_marcas) +
+freq_relativa_plot <- devolucao_marcas %>% filter(!is.na(freq_relativa))
+
+ggplot(freq_relativa_plot) +
   aes(
-    x = fct_reorder(Devolução, freq, .desc = TRUE), y = freq,
+    x = fct_reorder(Devolucao, freq, .desc = TRUE), y = freq_relativa * 100,
     fill = Marca
   ) +
   geom_col(position = position_dodge2(preserve = "single", padding = 0)) +
   geom_text(
-    aes(label = paste0(freq, " (", scales::percent(freq_relativa), ")")),
+    aes(label = scales::percent(freq_relativa, accuracy = 0.01)),
     position = position_dodge(width = 0.9),
     vjust = -0.5, hjust = 0.5,
     size = 2
   ) +
-  labs(x = "Tipo de Devolução", y = "Frequência") +
+  labs(x = "Tipo de Devolução", y = "Frequência Relativa") +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1, scale = 1, suffix = "%")) +
   theme_estat()
 
-ggsave("analise5certa.pdf", width = 158, height = 93, units = "mm")
-  
+ggsave("analise5correta.pdf", width = 158, height = 93, units = "mm")
