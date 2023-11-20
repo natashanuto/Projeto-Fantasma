@@ -36,6 +36,27 @@ theme_estat <- function(...) {
 #Análise 1
 
 
+#Data frame para análise 1
+
+analise1 <- select(vendas, `""Data Venda""`, `""Category""`, `""Price""`)
+analise1 <- na.omit(analise1)
+duplicados1 <- duplicated(analise1)
+analise1_sem_duplicados <- analise1[!duplicated(analise1),]
+
+#Gráfico de linhas faturamento anual por categoria
+
+ggplot(analise1_sem_duplicados) +
+  aes(x = `""Data Venda""`, y = `""Price""`, group = `""Category""`, colour = `""Category""`) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_colour_manual(name = "Categoria", labels = c("Moda Feminina", "B", "C")) +
+  labs(x = "Mês", y = "Faturamento") +
+  scale_x_date() +
+  scale_y_date() +
+  scale_x_datetime() +
+  scale_y_datetime()+
+  theme_estat()
+ggsave("series_grupo.pdf", width = 158, height = 93, units = "mm")
 
 #Análise 2
 
@@ -46,7 +67,7 @@ marcas <- unique(vendas$`""Brand""`)
 
 #As marcas a serem avaliadas são Adidas, H&M, Zara, Gucci e Nike.
 
-#Data frame com apenas marcas e preços
+#Data frame para Análise 2
 
 analise2 <- select(vendas, `""Brand""`, `""Price""`)
 analise2 <- na.omit(analise2)
@@ -211,6 +232,7 @@ analise4 <- na.omit(analise4)
 analise4$`""Rating""` <- as.numeric(analise4$`""Rating""`)
 analise4$`""Rating""` <- round(analise4$`""Rating""`, 1)
 
+
 #Gráfico de Dispersão Bivariado para ilustrar "Relação entre preço e avaliação"
 
 
@@ -245,63 +267,69 @@ devolucoes <- unique(vendas$`""Motivo devolução"""`)
 
 analise5 <- select(vendas, `""Motivo devolução"""`, `""Brand""`,`""...1.y""`)
 analise5 <- na.omit(analise5)
+duplicados5 <- duplicated(analise5)
+analise5_sem_duplicados <- analise5[!duplicated(analise5),]
+
 
 #Devoluções com motivo "Produto com defeito"
 
-produto_com_defeito <- analise5[analise5$`""Motivo devolução"""` == "\"\"Produto com defeito\"\"\"",]
+produto_com_defeito <- analise5_sem_duplicados[analise5_sem_duplicados$`""Motivo devolução"""` == "\"\"Produto com defeito\"\"\"",]
 frequencia_absoluta_pcd <- table(produto_com_defeito$`""Brand""`)
 
 #Frequências absolutas são: 
 #Adidas  Gucci    H&M   Nike   Zara 
-#   30     20     27     29     20 
+#   25     19     27     25     19 
 
 frequencia_relativa_pcd <- (frequencia_absoluta_pcd / sum(frequencia_absoluta_pcd)) * 100
 frequencia_porcentagem_arredondada_pcd <- round(frequencia_relativa_pcd, 2)
 
 #Frequências relativas em porcentagem são:
 #Adidas  Gucci    H&M   Nike   Zara 
-# 23.81  15.87  21.43  23.02  15.87
+# 21.74  16.52   23.48  21.74  16.52
 
-
-#Devoluções com motivo "Arrependimento"
-
-arrependimento <- analise5[analise5$`""Motivo devolução"""` == "\"\"Arrependimento\"\"\"", ]
-frequencia_absoluta_ar <- table(arrependimento$`""Brand""`)
-
-#Frequências absolutas são:
-#Adidas  Gucci    H&M   Nike   Zara 
-#   20     24     19     39     34 
-
-frequencia_relativa_ar <- (frequencia_absoluta_ar / sum(frequencia_absoluta_ar)) * 100
-frequencia_porcentagem_arredondada_ar <- round(frequencia_relativa_ar, 2)
-
-#Frequências relativas em porcentagem são:
-#Adidas  Gucci    H&M   Nike   Zara 
-# 14.71  17.65  13.97  28.68  25.00 
 
 
 #Devoluções com motivo "Não informado"
 
-nao_informado <- analise5[analise5$`""Motivo devolução"""`== "\"\"Não informado\"\"\"", ]
+nao_informado <- analise5_sem_duplicados[analise5_sem_duplicados$`""Motivo devolução"""`== "\"\"Não informado\"\"\"", ]
 frequencia_absoluta_ni <- table(nao_informado$`""Brand""`)
 
 #Frequências absolutas são:
 #Adidas  Gucci    H&M   Nike   Zara 
-#   28     26     22     28     20 
+#   25     22     20     24     20 
 
 frequencia_relativa_ni <- (frequencia_absoluta_ni / sum(frequencia_absoluta_ni)) * 100
 frequencia_porcentagem_arredondada_ni <- round(frequencia_relativa_ni, 2)
 
 #Frequências relativas em porcentagem são:
 #Adidas  Gucci    H&M   Nike   Zara 
-# 22.58  20.97  17.74  22.58  16.13 
+# 22.52  19.82  18.02  21.62  18.02 
+
+
+
+#Devoluções com motivo "Arrependimento"
+
+arrependimento <- analise5_sem_duplicados[analise5_sem_duplicados$`""Motivo devolução"""` == "\"\"Arrependimento\"\"\"", ]
+frequencia_absoluta_ar <- table(arrependimento$`""Brand""`)
+
+#Frequências absolutas são:
+#Adidas  Gucci    H&M   Nike   Zara 
+#   18     21     17     34     31 
+
+frequencia_relativa_ar <- (frequencia_absoluta_ar / sum(frequencia_absoluta_ar)) * 100
+frequencia_porcentagem_arredondada_ar <- round(frequencia_relativa_ar, 2)
+
+#Frequências relativas em porcentagem são:
+#Adidas  Gucci    H&M   Nike   Zara 
+# 14.88  17.36  14.05  28.10  25.62 
+
 
 
 
 #Gráfico para ilustrar a tabela
 
 
-devolucao_marcas <- analise5 %>%
+devolucao_marcas <- analise5_sem_duplicados %>%
   mutate(
     Devolucao = case_when(
       `""Motivo devolução"""` %>% str_detect("\"\"Arrependimento\"\"\"") ~ "Arrependimento",
@@ -340,4 +368,107 @@ ggplot(freq_relativa_plot) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1, scale = 1, suffix = "%")) +
   theme_estat()
 
-ggsave("analise5correta.pdf", width = 158, height = 93, units = "mm")
+ggsave("analise5semduplicados.pdf", width = 158, height = 93, units = "mm")
+
+
+#Análise 6
+
+#Data frame para análise 6
+
+analise6 <- select(vendas, `""Rating""`, `""Brand""`)
+analise6 <- na.omit(analise6)
+duplicados6 <- duplicated(analise6)
+analise6_sem_duplicados <- analise6[!duplicated(analise6),]
+
+
+# Gráfico para representação de avaliação média por marca
+
+ggplot(analise6_sem_duplicados) +
+  aes(x = gsub("\"", "", `""Brand""`), y = `""Rating""`) +
+  geom_boxplot(fill = c("#A11D21"), width = 0.5) +
+  stat_summary(
+    fun = "mean", geom = "point", shape = 23, size = 3, fill = "white"
+  ) +
+  labs(x = "Marca", y = "Avaliação") +
+  theme_estat()
+ggsave("analise6.pdf", width = 158, height = 93, units = "mm")
+
+
+#Medidas resumos de avaliação por marca
+
+#Adidas
+
+adidas6 <- analise6_sem_duplicados[analise6_sem_duplicados$`""Brand""`== "\"\"Adidas\"\""]
+summary(adidas6$`""Rating""`)
+sd(adidas6$`""Rating""`)
+
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max.  Desvio Padrão
+# 1.21   2.20    2.54     2.54  2.91     3.94     0.50
+
+
+#Gucci
+
+gucci6 <- analise6_sem_duplicados[analise6_sem_duplicados$`""Brand""`== "\"\"Gucci\"\""]
+summary(gucci6$`""Rating""`)
+sd(gucci6$`""Rating""`)
+
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max.  Desvio Padrão
+# 1.17   2.17   2.53     2.52   2.83     3.69      0.48 
+
+
+#H&M
+
+hnm6 <- analise6_sem_duplicados[analise6_sem_duplicados$`""Brand""`== "\"\"H&M\"\""]
+summary(hnm6$`""Rating""`)
+sd(hnm6$`""Rating""`)
+
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. Desvio Padrão
+# 1.24   2.16   2.47     2.51   2.82     4.18    0.49 
+
+
+#Nike
+
+nike6 <- analise6_sem_duplicados[analise6_sem_duplicados$`""Brand""`== "\"\"Nike\"\""]
+summary(nike6$`""Rating""`)
+sd(nike6$`""Rating""`)
+
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. Desvio Padrão
+# 1.06   2.18    2.54      2.49   2.81    3.65   0.50 
+
+
+#Zara
+
+zara6 <- analise6_sem_duplicados[analise6_sem_duplicados$`""Brand""`== "\"\"Zara\"\""]
+summary(zara6$`""Rating""`)
+sd(zara6$`""Rating""`)
+
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max.  Desvio Padrão
+# 1.06   2.23   2.56     2.54   2.88     3.95      0.48 
+
+
+# Quadro Resumo
+
+
+quadro_resumo <- analise6_sem_duplicados %>% 
+  group_by(`""Brand""`) %>% 
+  summarize(Média = round(mean(`""Rating""`),2),
+            `Desvio Padrão` = round(sd(`""Rating""`),2),
+            `Variância` = round(var(`""Rating""`),2),
+            `Mínimo` = round(min(`""Rating""`),2),
+            `1º Quartil` = round(quantile(`""Rating""`, probs = .25),2),
+            Mediana = round(quantile(`""Rating""`, probs = .5),2),
+            `3º Quartil` = round(quantile(`""Rating""`, probs = .75),2),
+            `Máximo` = round(max(`""Rating""`),2)) %>% t() %>% as.data.frame() %>% 
+  mutate(V1 = str_replace(V1,"\\.",",")) 
+
+xtable::xtable(quadro_resumo)
+
+#""Brand"" & ""Adidas"" & ""Gucci"" & ""H\&M"" & ""Nike"" & ""Zara"" \\ 
+#Média & 2,54 & 2.52 & 2.51 & 2.49 & 2.54 \\ 
+#Desvio Padrão & 0,50 & 0.48 & 0.49 & 0.50 & 0.48 \\ 
+#Variância & 0,25 & 0.23 & 0.24 & 0.25 & 0.23 \\ 
+#Mínimo & 1,21 & 1.17 & 1.24 & 1.06 & 1.06 \\ 
+#1º Quartil & 2,20 & 2.17 & 2.16 & 2.18 & 2.23 \\ 
+#Mediana & 2,54 & 2.53 & 2.47 & 2.54 & 2.56 \\ 
+#3º Quartil & 2,91 & 2.83 & 2.82 & 2.81 & 2.88 \\ 
+#Máximo & 3,94 & 3.69 & 4.18 & 3.65 & 3.95 \\ 
