@@ -71,61 +71,63 @@ marcas <- unique(vendas$`""Brand""`)
 
 analise2 <- select(vendas, `""Brand""`, `""Price""`)
 analise2 <- na.omit(analise2)
+duplicados2 <- duplicated(analise2)
+analise2_sem_duplicados <- analise2[!duplicated(analise2),]
 
 #Adidas
 
-adidas <- analise2[analise2$`""Brand""`== "\"\"Adidas\"\""]
+adidas <- analise2_sem_duplicados[analise2_sem_duplicados$`""Brand""`== "\"\"Adidas\"\""]
 summary(adidas$`""Price""`)
 sd(adidas$`""Price""`)
 
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max.  Desvio Padrão
-#10.00   41.00   52.00   51.45   62.00   96.00     16.43
+#10.00   35.00   51.00   50.98   67.00   96.00     20.93
 
 
 #Gucci
 
-gucci <- analise2[analise2$`""Brand""`== "\"\"Gucci\"\""]
+gucci <- analise2_sem_duplicados[analise2_sem_duplicados$`""Brand""`== "\"\"Gucci\"\""]
 summary(gucci$`""Price""`)
 sd(gucci$`""Price""`)
 
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max.  Desvio Padrão
-#10.00   38.00   50.00   49.71   61.00   92.00    15.63
+#10.00   34.50   50.00   50.15   64.50   92.00    20.06
 
 
 #H&M
 
-hnm <- analise2[analise2$`""Brand""`== "\"\"H&M\"\""]
+hnm <- analise2_sem_duplicados[analise2_sem_duplicados$`""Brand""`== "\"\"H&M\"\""]
 summary(hnm$`""Price""`)
 sd(hnm$`""Price""`)
 
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max. Desvio Padrão
-#10.00   38.00   49.00   49.44   59.00  100.00   16.26
+#10.00   33.25   49.50   49.76   65.75  100.00   21.29
 
 
 #Nike
 
-nike <- analise2[analise2$`""Brand""`== "\"\"Nike\"\""]
+nike <- analise2_sem_duplicados[analise2_sem_duplicados$`""Brand""`== "\"\"Nike\"\""]
 summary(nike$`""Price""`)
 sd(nike$`""Price""`)
 
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max. Desvio Padrão
-#10.00   38.00   51.00   49.77   62.00   90.00    17.16
+#10.00   32.25   49.50   48.82   65.75   90.00    21.34
 
 
 #Zara
 
-zara <- analise2[analise2$`""Brand""`== "\"\"Zara\"\""]
+zara <- analise2_sem_duplicados[analise2_sem_duplicados$`""Brand""`== "\"\"Zara\"\""]
 summary(zara$`""Price""`)
 sd(zara$`""Price""`)
 
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max.  Desvio Padrão
-#10.00   43.00   53.00   52.86   63.00   90.00     15.36
+#10.00   35.50   51.00   51.22   66.50   90.00     20.22
 
 
 # Quadro Resumo
 
 
-quadro_resumo <- analise2 %>% 
+quadro_resumo <- analise2_sem_duplicados %>% 
   group_by(`""Brand""`) %>% 
   summarize(Média = round(mean(`""Price""`),2),
             `Desvio Padrão` = round(sd(`""Price""`),2),
@@ -139,20 +141,21 @@ quadro_resumo <- analise2 %>%
 
 xtable::xtable(quadro_resumo)
 
+#\hline
 #""Brand"" & ""Adidas"" & ""Gucci"" & ""H\&M"" & ""Nike"" & ""Zara"" \\ 
-#Média & 51,45 & 49.71 & 49.44 & 49.77 & 52.86 \\ 
-#Desvio Padrão & 16,43 & 15.63 & 16.26 & 17.16 & 15.36 \\ 
-#Variância & 270,04 & 244.23 & 264.45 & 294.31 & 235.99 \\ 
+#Média & 50,98 & 50.15 & 49.76 & 48.82 & 51.22 \\ 
+#Desvio Padrão & 20,93 & 20.06 & 21.29 & 21.34 & 20.22 \\ 
+#Variância & 437,89 & 402.55 & 453.29 & 455.23 & 408.79 \\ 
 #Mínimo & 10 & 10 & 10 & 10 & 10 \\ 
-#1º Quartil & 41 & 38 & 38 & 38 & 43 \\ 
-#Mediana & 52 & 50 & 49 & 51 & 53 \\ 
-#3º Quartil & 62 & 61 & 59 & 62 & 63 \\ 
+#1º Quartil & 35,00 & 34.50 & 33.25 & 32.25 & 35.50 \\ 
+#Mediana & 51,0 & 50.0 & 49.5 & 49.5 & 51.0 \\ 
+#3º Quartil & 67,00 & 64.50 & 65.75 & 65.75 & 66.50 \\ 
 #Máximo &  96 &  92 & 100 &  90 &  90 \\ 
 
 #Gráfico dos preços por marca
 
 
-ggplot(analise2) +
+ggplot(analise2_sem_duplicados) +
   aes(x = gsub("\"", "", `""Brand""`), y = `""Price""`) +
   geom_boxplot(fill = c("#A11D21"), width = 0.5) +
   stat_summary(
@@ -161,7 +164,7 @@ ggplot(analise2) +
   labs(x = "Marcas", y = "Preço da peça") +
   theme_estat()
 
-ggsave("analise2certa.pdf", width = 158, height = 93, units = "mm")
+ggsave("analise2semduplicatas.pdf", width = 158, height = 93, units = "mm")
 
 
 #Análise 3
@@ -198,27 +201,42 @@ colors2 <- analise3 %>%
   filter(!is.na(Cor)) %>%
   group_by(Cor, Categoria) %>%
   summarise(freq = n()) %>%
-  mutate(freq_relativa = scales::percent(freq / sum(freq)))
+  ungroup() %>%
+  group_by(Cor) %>%
+  mutate(freq_relativa = freq / sum(freq))
 
 
-porcentagens <- str_c(colors2$freq_relativa, "%") %>% str_replace("\\.", ",")
+freq_relativa_p <- colors2 %>% filter(!is.na(freq_relativa))
 
-legendas <- str_squish(str_c(colors2$freq, " (", porcentagens, ")"))
-
-ggplot(colors2) +
+ggplot(freq_relativa_p) +
   aes(
-    x = fct_reorder(Cor, freq, .desc = T), y = freq,
-    fill = Categoria, label = legendas
+    x = fct_reorder(Cor, freq, .desc = TRUE), y = freq_relativa * 100,
+    fill = Categoria
   ) +
   geom_col(position = position_dodge2(preserve = "single", padding = 0)) +
   geom_text(
-    position = position_dodge(width = .9),
-    vjust = -0.5, hjust = 0.45,
-    size = 1.58
+    aes(label = scales::percent(freq_relativa, accuracy = 0.01)),
+    position = position_dodge(width = 0.9),
+    vjust = -0.5, hjust = 0.5,
+    size = 2
   ) +
-  labs(x = "Cores", y = "Frequência") +
+  labs(x = "Cores", y = "Frequência Relativa") +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1, scale = 1, suffix = "%")) +
   theme_estat()
-ggsave("análise3.pdf", width = 158, height = 93, units = "mm")
+
+ggsave("análise3c.pdf", width = 158, height = 93, units = "mm")
+
+#Tabela frequências absolutas
+
+moda_masculina <- analise3[analise3$`""Color"""` == "\"\"Produt\"\"\"",]
+frequencia_absoluta_pcd <- table(produto_com_defeito$`""Brand""`)
+
+#Frequências absolutas são: 
+#Adidas  Gucci    H&M   Nike   Zara 
+#   25     19     27     25     19 
+
+frequencia_relativa_pcd <- (frequencia_absoluta_pcd / sum(frequencia_absoluta_pcd)) * 100
+frequencia_porcentagem_arredondada_pcd <- round(frequencia_relativa_pcd, 2)
 
 
 
@@ -236,7 +254,7 @@ analise4$`""Rating""` <- round(analise4$`""Rating""`, 1)
 #Gráfico de Dispersão Bivariado para ilustrar "Relação entre preço e avaliação"
 
 
-ggplot(analise4) +
+ggplot(analise4_sem_duplicados) +
   aes(x =`""Price""`, y = `""Rating""`) +
   geom_point(colour = "#A11D21", size = 3) +
   labs(
@@ -245,14 +263,71 @@ ggplot(analise4) +
   ) +
   theme_estat()
 
-ggsave("análise4correta.pdf", width = 158, height = 93, units = "mm")
+ggsave("análise4semduplicatas.pdf", width = 158, height = 93, units = "mm")
 
+#Quadro resmuo Preço 
+
+quadro_resumo <- analise4_sem_duplicados %>% 
+  summarize(Média = round(mean(`""Price""`),2),
+            `Desvio Padrão` = round(sd(`""Price""`),2),
+            `Variância` = round(var(`""Price""`),2),
+            `Mínimo` = round(min(`""Price""`),2),
+            `1º Quartil` = round(quantile(`""Price""`, probs = .25),2),
+            Mediana = round(quantile(`""Price""`, probs = .5),2),
+            `3º Quartil` = round(quantile(`""Price""`, probs = .75),2),
+            `Máximo` = round(max(`""Price""`),2)) %>% t() %>% as.data.frame() %>% 
+  mutate(V1 = str_replace(V1,"\\.",",")) 
+
+xtable::xtable(quadro_resumo)
+
+#Média & 50,51 \\ 
+#Desvio Padrão & 19,27 \\ 
+#Mínimo & 10 \\ 
+#1º Quartil & 36 \\ 
+#Mediana & 50 \\ 
+#3º Quartil & 64,5 \\ 
+#Máximo & 100 \\ 
+
+summary(analise4_sem_duplicados$`""Price""`)
+sd(analise4_sem_duplicados$`""Price""`)
+
+#Min. 1st Qu.  Median    Mean 3rd Qu.    Max.  Desvio Padrão 
+#10.00   36.00   50.00   50.51   64.50  100.00    19.27
+
+#Quadro resumo Avaliação
+
+quadro_resumo <- analise4_sem_duplicados %>% 
+  summarize(Média = round(mean(`""Rating""`),2),
+            `Desvio Padrão` = round(sd(`""Rating""`),2),
+            `Variância` = round(var(`""Rating""`),2),
+            `Mínimo` = round(min(`""Rating""`),2),
+            `1º Quartil` = round(quantile(`""Rating""`, probs = .25),2),
+            Mediana = round(quantile(`""Rating""`, probs = .5),2),
+            `3º Quartil` = round(quantile(`""Rating""`, probs = .75),2),
+            `Máximo` = round(max(`""Rating""`),2)) %>% t() %>% as.data.frame() %>% 
+  mutate(V1 = str_replace(V1,"\\.",",")) 
+
+xtable::xtable(quadro_resumo)
+
+#Média & 2,52 \\ 
+#Desvio Padrão & 0,59 \\ 
+#Mínimo & 1,1 \\ 
+#1º Quartil & 2,1 \\ 
+#Mediana & 2,5 \\ 
+#3º Quartil & 3 \\ 
+#Máximo & 4,2 \\
+
+summary(analise4_sem_duplicados$`""Rating""`)
+sd(analise4_sem_duplicados$`""Rating""`)
+
+#Min. 1st Qu.  Median    Mean 3rd Qu.    Max.  Desvio Padrão 
+#1.10   2.10   2.50     2.52   3.00     4.20     0.59
 
 #Calculando o Coeficiente de Correlação de Pearson
 
-coeficiente_pearson <- cor(analise4$`""Rating""`, analise4$`""Price""`)
+coeficiente_pearson <- cor(analise4_sem_duplicados$`""Rating""`, analise4_sem_duplicados$`""Price""`)
 
-#O Coeficiente de Correlação de Pearson é de 0.9108202. Apresenta uma correlação diretamente proporcional forte.
+#O Coeficiente de Correlação de Pearson é de 0.9074029. Apresenta uma correlação diretamente proporcional forte.
 
 
 
