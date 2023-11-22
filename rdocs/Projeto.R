@@ -42,22 +42,44 @@ analise1 <- select(vendas, `""Data Venda""`, `""Category""`, `""Price""`)
 analise1 <- na.omit(analise1)
 duplicados1 <- duplicated(analise1)
 analise1_sem_duplicados <- analise1[!duplicated(analise1),]
+analise1_sem_duplicados$`""Data Venda""` <- analise1_sem_duplicados$`""Data Venda""` <- gsub("\"", "", analise1_sem_duplicados$`""Data Venda""`)
+
+#Lubridate - Trabalhando a coluna "Data Venda"
+
+analise1_sem_duplicados$`""Data Venda""` <- mdy(analise1_sem_duplicados$`""Data Venda""`)
+analise1_sem_duplicados$`""Data Venda""` <- month(analise1_sem_duplicados$`""Data Venda""`)
+
+meses <- c("Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez")
+analise1_sem_duplicados$`""Data Venda""` <- meses[analise1_sem_duplicados$`""Data Venda""`]
+
 
 #Gráfico de linhas faturamento anual por categoria
 
-ggplot(analise1_sem_duplicados) +
-  aes(x = `""Data Venda""`, y = `""Price""`, group = `""Category""`, colour = `""Category""`) +
+somaprecos <- analise1_sem_duplicados %>%
+  group_by(`""Data Venda""`, `""Category""`) %>%
+  summarise(Faturamento = sum(`""Price""`)) %>%
+  mutate(Categoria = case_when(
+    str_detect(`""Category""`, "\"\"Women's Fashion\"\"") ~ "Moda Feminina",
+    str_detect(`""Category""`, "\"\"Men's Fashion\"\"") ~ "Moda Masculina",
+    str_detect(`""Category""`, "\"\"Kids' Fashion\"\"") ~ "Moda Infantil",
+  ))
+
+somaprecos$`""Data Venda""` <- factor(somaprecos$`""Data Venda""`, levels = meses)
+somaprecos <- somaprecos[order(match(somaprecos$`""Data Venda""`, meses)), ]
+
+categoria <- c("Moda Feminina", "Moda Masculina", "Moda Infantil")
+somaprecos$Categoria <- factor(somaprecos$Categoria, levels = categoria)
+
+ggplot(somaprecos) +
+  aes(x = `""Data Venda""`, y = Faturamento, group = Categoria, color = Categoria) +
   geom_line(size = 1) +
   geom_point(size = 2) +
-  scale_colour_manual(name = "Categoria", labels = c("Moda Feminina", "B", "C")) +
+  scale_colour_manual(name = "Categoria", labels = categoria) +
   labs(x = "Mês", y = "Faturamento") +
-  scale_x_date() +
-  scale_y_date() +
-  scale_x_datetime() +
-  scale_y_datetime()+
   theme_estat()
-ggsave("series_grupo.pdf", width = 158, height = 93, units = "mm")
 
+ggsave("analise.pdf", width = 158, height = 93, units = "mm")
+  
 #Análise 2
 
 
@@ -225,18 +247,6 @@ ggplot(freq_relativa_p) +
   theme_estat()
 
 ggsave("análise3c.pdf", width = 158, height = 93, units = "mm")
-
-#Tabela frequências absolutas
-
-moda_masculina <- analise3[analise3$`""Color"""` == "\"\"Produt\"\"\"",]
-frequencia_absoluta_pcd <- table(produto_com_defeito$`""Brand""`)
-
-#Frequências absolutas são: 
-#Adidas  Gucci    H&M   Nike   Zara 
-#   25     19     27     25     19 
-
-frequencia_relativa_pcd <- (frequencia_absoluta_pcd / sum(frequencia_absoluta_pcd)) * 100
-frequencia_porcentagem_arredondada_pcd <- round(frequencia_relativa_pcd, 2)
 
 
 
@@ -429,8 +439,8 @@ freq_relativa_plot <- devolucao_marcas %>% filter(!is.na(freq_relativa))
 
 ggplot(freq_relativa_plot) +
   aes(
-    x = fct_reorder(Devolucao, freq, .desc = TRUE), y = freq_relativa * 100,
-    fill = Marca
+    x = fct_reorder(Marca, freq, .desc = TRUE), y = freq_relativa * 100,
+    fill = Devolucao
   ) +
   geom_col(position = position_dodge2(preserve = "single", padding = 0)) +
   geom_text(
@@ -439,11 +449,11 @@ ggplot(freq_relativa_plot) +
     vjust = -0.5, hjust = 0.5,
     size = 2
   ) +
-  labs(x = "Tipo de Devolução", y = "Frequência Relativa") +
+  labs(x = "Marca", y = "Frequência Relativa") +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1, scale = 1, suffix = "%")) +
   theme_estat()
 
-ggsave("analise5semduplicados.pdf", width = 158, height = 93, units = "mm")
+ggsave("analise5semduplicad.pdf", width = 158, height = 93, units = "mm")
 
 
 #Análise 6
