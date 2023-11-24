@@ -76,9 +76,10 @@ ggplot(somaprecos) +
   geom_point(size = 2) +
   scale_colour_manual(name = "Categoria", labels = categoria) +
   labs(x = "Mês", y = "Faturamento") +
+  scale_y_continuous(breaks = seq(0, 4000, by = 1000), expand = c(0, 0), limits = c(0, 4000))  +
   theme_estat()
 
-ggsave("analise.pdf", width = 158, height = 93, units = "mm")
+ggsave("analise1final.pdf", width = 158, height = 93, units = "mm")
   
 #Análise 2
 
@@ -184,9 +185,10 @@ ggplot(analise2_sem_duplicados) +
     fun = "mean", geom = "point", shape = 23, size = 3, fill = "white"
   ) +
   labs(x = "Marcas", y = "Preço da peça") +
+  scale_y_continuous(breaks = seq(0, 100, by = 25), expand = c(0, 0), limits = c(0, 100)) +
   theme_estat()
 
-ggsave("analise2semduplicatas.pdf", width = 158, height = 93, units = "mm")
+ggsave("analise2final.pdf", width = 158, height = 93, units = "mm")
 
 
 #Análise 3
@@ -215,8 +217,7 @@ colors2 <- analise3 %>%
     ),
     Categoria = case_when(
       str_detect(`""Category""`, "\"\"Women's Fashion\"\"") ~ "Moda Feminina",
-      str_detect(`""Category""`, "\"\"Men's Fashion\"\"") ~ "Moda Masculina",
-      TRUE ~ as.character(`""Category""`)
+      str_detect(`""Category""`, "\"\"Men's Fashion\"\"") ~ "Moda Masculina"
     )
   ) %>%
   filter(`""Category""` != "\"\"Kids' Fashion\"\"") %>%
@@ -232,23 +233,30 @@ freq_relativa_p <- colors2 %>% filter(!is.na(freq_relativa))
 
 ggplot(freq_relativa_p) +
   aes(
-    x = fct_reorder(Cor, freq, .desc = TRUE), y = freq_relativa * 100,
+    x = fct_reorder(Cor, freq, .desc = TRUE), y = freq_relativa,
     fill = Categoria
   ) +
   geom_col(position = position_dodge2(preserve = "single", padding = 0)) +
   geom_text(
-    aes(label = scales::percent(freq_relativa, accuracy = 0.01)),
+    aes(label = sprintf("%.1f%%", freq_relativa * 100)),
     position = position_dodge(width = 0.9),
     vjust = -0.5, hjust = 0.5,
     size = 2
   ) +
   labs(x = "Cores", y = "Frequência Relativa") +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1, scale = 1, suffix = "%")) +
+  scale_y_continuous(
+    breaks = seq(0, 0.6, by = 0.2),
+    expand = c(0, 0),
+    limits = c(0, 0.6),
+    labels = scales::percent
+  ) +
   theme_estat()
 
-ggsave("análise3c.pdf", width = 158, height = 93, units = "mm")
+ggsave("análise3final.pdf", width = 158, height = 93, units = "mm")
 
+#Frequências absolutas 
 
+view(colors2)
 
 #Análise 4
 
@@ -416,7 +424,7 @@ frequencia_porcentagem_arredondada_ar <- round(frequencia_relativa_ar, 2)
 
 devolucao_marcas <- analise5_sem_duplicados %>%
   mutate(
-    Devolucao = case_when(
+    Devolução = case_when(
       `""Motivo devolução"""` %>% str_detect("\"\"Arrependimento\"\"\"") ~ "Arrependimento",
       `""Motivo devolução"""` %>% str_detect("\"\"Produto com defeito\"\"\"") ~ "Produto com defeito",
       `""Motivo devolução"""` %>% str_detect("\"\"Não informado\"\"\"") ~ "Não informado"
@@ -429,10 +437,10 @@ devolucao_marcas <- analise5_sem_duplicados %>%
       `""Brand""` %>% str_detect("\"\"Zara\"\"") ~ "Zara"
     )
   ) %>%
-  group_by(Devolucao, Marca) %>%
+  group_by(Devolução, Marca) %>%
   summarise(freq = n()) %>%
   ungroup() %>%
-  group_by(Devolucao) %>%
+  group_by(Devolução) %>%
   mutate(freq_relativa = freq / sum(freq))
 
 freq_relativa_plot <- devolucao_marcas %>% filter(!is.na(freq_relativa))
@@ -440,7 +448,7 @@ freq_relativa_plot <- devolucao_marcas %>% filter(!is.na(freq_relativa))
 ggplot(freq_relativa_plot) +
   aes(
     x = fct_reorder(Marca, freq, .desc = TRUE), y = freq_relativa * 100,
-    fill = Devolucao
+    fill = Devolução
   ) +
   geom_col(position = position_dodge2(preserve = "single", padding = 0)) +
   geom_text(
@@ -450,10 +458,14 @@ ggplot(freq_relativa_plot) +
     size = 2
   ) +
   labs(x = "Marca", y = "Frequência Relativa") +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1, scale = 1, suffix = "%")) +
+  scale_y_continuous(
+    labels = scales::percent_format(accuracy = 1, scale = 1, suffix = "%"),
+    breaks = seq(0, 30, by = 10),
+    limits = c(0, 30)
+  ) +
   theme_estat()
 
-ggsave("analise5semduplicad.pdf", width = 158, height = 93, units = "mm")
+ggsave("analise5final.pdf", width = 158, height = 93, units = "mm")
 
 
 #Análise 6
